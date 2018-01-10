@@ -9,6 +9,9 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import di.cs.skuniv.dao.HangulDao;
 
 @Service("HangulService")
@@ -28,18 +31,22 @@ public class HangulService {
 	@Resource(name="HangulDao")
 	private HangulDao hanguldao;
 
-	public List<Map<String,Integer>> getHangul(String input) {
-		List<Map<String,Integer>> list=new ArrayList<Map<String ,Integer>>();
+	public List<Map<String,JsonArray>> getHangul(String input) {
+		List<Map<String,JsonArray>> return_list=new ArrayList<Map<String,JsonArray>>();
+		
 		String tempStr=input;
 		String lastStr="";
 		
 		System.out.println(tempStr);
 		
 		for(int i=0;i<tempStr.length();i++) {
-			Map<String , Integer> map=new HashMap<String,Integer>();
+			
 			char test=tempStr.charAt(i);
 			
 			if(test>=0xAC00) {
+				
+				Map<String,JsonArray> return_map=new HashMap<String, JsonArray>();
+				
 				char uniVal = (char) (test - 0xAC00);
 				char cho =(char)(((uniVal-(uniVal%28))/28)/21);
 				char jun =(char)(((uniVal-(uniVal%28))/28)%21);
@@ -51,32 +58,49 @@ public class HangulService {
 				if((char)jon!=0x0000)
 				System.out.println(""+JON[jon]+"// 0x"+Integer.toHexString((char)jon));
 				
-				map.put("cho",(int)cho);
-				map.put("jun",(int)jun);
-				map.put("jon",(int)jon);
-				list.add(map);
+				/*return_map.put("cho",(int)cho);
+				return_map.put("jun",(int)jun);
+				return_map.put("jon",(int)jon);*/
+				
+				//데이터 베이스에서 초성, 중성, 종성을 가져오는 그릇.
+				List<Map<String,Object>> return_db;
+				
+				
+				//초성
+				
+				return_db=hanguldao.getCho((int)cho);				
+				return_map.put("cho", process(return_db));
+				
+				
+				//중성
+				return_db=hanguldao.getJun((int)jun);				
+				return_map.put("jun", process(return_db));
+				
+				
+				//종성
+				if((int)jon!=0) {
+					return_db=hanguldao.getJon((int)jon);
+					return_map.put("jon", process(return_db));
+				}
+				return_list.add(return_map);
 			}
 		}
-		
-		for(int i=0;i<list.size();i++) {
-			int a=(int)(list.get(i)).get("cho");
-			int b=(int)(list.get(i)).get("jun");
-			int c=(int)(list.get(i)).get("jon");
-			
-			char temp=(char)(0xAC00+28*21*(a)+28*(b)+(c));
-			
-			lastStr=lastStr.concat(String.valueOf(temp));
+		for(int i=0;i<return_list.size();i++) {
+			System.out.println(return_list.get(i));
 		}
-		
-		System.out.println(""+lastStr);
-		
-		for(int i=0;i<list.size();i++) {
-			System.out.println(""+((Map)(list.get(i))).get("cho"));
-			System.out.println(""+((Map)(list.get(i))).get("jun"));
-			System.out.println(""+((Map)(list.get(i))).get("jon"));
+		return return_list;
+	}
+	private JsonArray process(List<Map<String,Object>> return_db) {
+		JsonArray ja=new JsonArray();
+		for(int j=0;j<return_db.size();j++) {
+			JsonObject jo=new JsonObject();
+			jo.addProperty("x1",  return_db.get(j).get("x1")+"");
+			jo.addProperty("y1",  return_db.get(j).get("y1")+"");
+			jo.addProperty("x2",  return_db.get(j).get("x2")+"");
+			jo.addProperty("y2",  return_db.get(j).get("y2")+"");
+			ja.add(jo);
 		}
-	
-		return list;
+		return ja;
 	}
 
 }

@@ -17,6 +17,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.google.gson.JsonArray;
+
 import di.cs.skuniv.service.HangulService;
 
 /**
@@ -24,8 +26,6 @@ import di.cs.skuniv.service.HangulService;
  */
 @Controller
 public class HangulController {
-	
-
 	
 	@Resource(name="HangulService")
 	private HangulService hangulservice;
@@ -39,8 +39,11 @@ public class HangulController {
 	@RequestMapping(value = "/hangul_input_complete")
 	public String hangul_input_complete(HttpServletRequest request) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
+		
 		String input=request.getParameter("input");
-		List<Map<String,Integer>> hangul_map_list=hangulservice.getHangul(input);
+		List<Map<String,JsonArray>> hangul_map_list=hangulservice.getHangul(input);
+		request.setAttribute("hangul_map_list", hangul_map_list);
+		
 		
 		return "hangul_input_complete";
 		
