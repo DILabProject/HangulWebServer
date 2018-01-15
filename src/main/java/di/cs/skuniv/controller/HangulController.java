@@ -17,8 +17,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 
+import di.cs.skuniv.model.HangulVO;
 import di.cs.skuniv.service.HangulService;
 
 /**
@@ -39,10 +41,12 @@ public class HangulController {
 	@RequestMapping(value = "/hangul_input_complete")
 	public String hangul_input_complete(HttpServletRequest request) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
-		
+		Gson gson=new Gson();
 		String input=request.getParameter("input");
-		List<Map<String,JsonArray>> hangul_map_list=hangulservice.getHangul(input);
-		request.setAttribute("hangul_map_list", hangul_map_list);
+		HangulVO HangulVO=hangulservice.getHangul(input);
+		
+		String str_HangulVO=gson.toJson(HangulVO);
+		request.setAttribute("str_HangulVO", str_HangulVO);
 		
 		
 		return "hangul_input_complete";

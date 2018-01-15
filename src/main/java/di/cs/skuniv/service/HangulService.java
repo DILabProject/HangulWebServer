@@ -13,25 +13,27 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import di.cs.skuniv.dao.HangulDao;
+import di.cs.skuniv.model.HangulVO;
 
 @Service("HangulService")
 public class HangulService {
 	
 	private static final char[] CHO= {0x3131,0x3132,0x3134,0x3137,0x3138,0x3139,0x3141,0x3142,
 			0x3143,0x3145,0x3146,0x3147,0x3148,0x3149,0x314a,0x314b,0x314c,0x314d,0x314e};
-		/*¤¡ ¤¢ ¤¤ ¤§ ¤¨ ¤© ¤± ¤² ¤³ ¤µ ¤¶ ¤· ¤¸  ¤¹ ¤º ¤» ¤¼ ¤½ ¤¾*/
+		/*ã„± ã„² ã„´ ã„· ã„¸ ã„¹ ã… ã…‚ ã…ƒ ã…… ã…† ã…‡ ã…ˆ ã…‰ ã…Š ã…‹ ã…Œ ã… ã…*/
 	private static final char[] JUN= {0x314f,0x3150,0x3151,0x3152,0x3153,0x3154,0x3155,0x3156,0x3157,0x3158,
 			0x3159,0x315a,0x315b,0x315c,0x315d,0x315e,0x315f,0x3160,0x3161,0x3162,0x3163};
-		/*¤¿ ¤À ¤Á ¤Â ¤Ã ¤Ä ¤Å ¤Æ ¤Ç ¤È ¤É ¤Ê ¤Ë ¤Ì ¤Í ¤Î ¤Ï ¤Ğ ¤Ñ ¤Ò ¤Ó*/
+		/*ã… ã… ã…‘ ã…’ ã…“ ã…” ã…• ã…– ã…— ã…˜ ã…™ ã…š ã…› ã…œ ã… ã… ã…Ÿ ã…  ã…¡ ã…¢ ã…£*/
 	private static final char[] JON= {0x0000,0x3131,0x3132,0x3133,0x3134,0x3135,0x3136,0x3137,0x3139,0x313a,0x313b,0x313c,0x313d,0x313e,0x313f,
 			0x3140,0x3141,0x3142,0x3144,0x3145,0x3146,0x3147,0x3148,0x314a,0x314b,0x314c,0x314d,0x314e};
-		/*X ¤¡ ¤¢ ¤£ ¤¤ ¤¥ ¤¦ ¤§ ¤© ¤ª ¤« ¤¬ ¤­ ¤® ¤¯ ¤° ¤± ¤² ¤´ ¤µ ¤¶ ¤· ¤¸ ¤º ¤» ¤¼ ¤½ ¤¾*/
+		/*X ã„± ã„² ã„³ ã„´ ã„µ ã„¶ ã„· ã„¹ ã„º ã„» ã„¼ ã„½ ã„¾ ã„¿ ã…€ ã… ã…‚ ã…„ ã…… ã…† ã…‡ ã…ˆ ã…Š ã…‹ ã…Œ ã… ã…*/
 	
 	
 	@Resource(name="HangulDao")
 	private HangulDao hanguldao;
 
-	public List<Map<String,JsonArray>> getHangul(String input) {
+	public HangulVO getHangul(String input) {
+		HangulVO hangulVO=new HangulVO();
 		List<Map<String,JsonArray>> return_list=new ArrayList<Map<String,JsonArray>>();
 		
 		String tempStr=input;
@@ -62,22 +64,22 @@ public class HangulService {
 				return_map.put("jun",(int)jun);
 				return_map.put("jon",(int)jon);*/
 				
-				//µ¥ÀÌÅÍ º£ÀÌ½º¿¡¼­ ÃÊ¼º, Áß¼º, Á¾¼ºÀ» °¡Á®¿À´Â ±×¸©.
+				//ë°ì´í„°ë² ì´ìŠ¤ì—ì„œ ì´ˆì„±, ì¤‘ì„±, ì¢…ì„±ì„ ê°€ì ¸ì˜¤ëŠ” ê·¸ë¦‡.
 				List<Map<String,Object>> return_db;
 				
 				
-				//ÃÊ¼º
+				//ì´ˆì„±
 				
 				return_db=hanguldao.getCho((int)cho);				
 				return_map.put("cho", process(return_db));
 				
 				
-				//Áß¼º
+				//ì¤‘ì„±
 				return_db=hanguldao.getJun((int)jun);				
 				return_map.put("jun", process(return_db));
 				
 				
-				//Á¾¼º
+				//ì¢…ì„±
 				if((int)jon!=0) {
 					return_db=hanguldao.getJon((int)jon);
 					return_map.put("jon", process(return_db));
@@ -88,7 +90,8 @@ public class HangulService {
 		for(int i=0;i<return_list.size();i++) {
 			System.out.println(return_list.get(i));
 		}
-		return return_list;
+		hangulVO.setHangul_map_list(return_list);
+		return hangulVO;
 	}
 	private JsonArray process(List<Map<String,Object>> return_db) {
 		JsonArray ja=new JsonArray();
