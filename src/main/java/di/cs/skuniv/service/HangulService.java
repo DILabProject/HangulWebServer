@@ -69,7 +69,6 @@ public class HangulService {
 				
 				
 				//초성
-				
 				return_db=hanguldao.getCho((int)cho);				
 				return_map.put("cho", process(return_db));
 				
