@@ -5,12 +5,12 @@
 
 	<select id="select_jon_List" resultType="hashmap" parameterType="Integer">
 			<![CDATA[
-				SELECT
-				    *
-				FROM
-				    hangul.jon	
-				WHERE 
-					jon_num=#{jon_num} order by jon_stroke_num;
+				SELECT 
+					*
+				FROM 
+					hangul.jon j, hangul.stroke s 
+				where 
+					j.jon_num=#{jon_num} and j.jon_stroke_num=s.stroke_num order by s.stroke_order;
 							
 			]]>
 	</select>

@@ -13,7 +13,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import di.cs.skuniv.dao.HangulDao;
-import di.cs.skuniv.model.HangulVO;
+
 
 @Service("HangulService")
 public class HangulService {
@@ -32,22 +32,22 @@ public class HangulService {
 	@Resource(name="HangulDao")
 	private HangulDao hanguldao;
 
-	public HangulVO getHangul(String input) {
-		HangulVO hangulVO=new HangulVO();
-		List<Map<String,JsonArray>> return_list=new ArrayList<Map<String,JsonArray>>();
+	public JsonObject getHangul(String input) {
+		JsonObject jsonObject=new JsonObject();
+		JsonArray wordJsonArr=new JsonArray();
+		JsonArray strokeJsonArr=new JsonArray();
 		
 		String tempStr=input;
 		String lastStr="";
 		
 		System.out.println(tempStr);
-		
+		List<Map<String,Object>> return_db;
 		for(int i=0;i<tempStr.length();i++) {
+			JsonArray word_unit_jsonArray=new JsonArray();
 			
 			char test=tempStr.charAt(i);
 			
 			if(test>=0xAC00) {
-				
-				Map<String,JsonArray> return_map=new HashMap<String, JsonArray>();
 				
 				char uniVal = (char) (test - 0xAC00);
 				char cho =(char)(((uniVal-(uniVal%28))/28)/21);
@@ -60,40 +60,45 @@ public class HangulService {
 				if((char)jon!=0x0000)
 				System.out.println(""+JON[jon]+"// 0x"+Integer.toHexString((char)jon));
 				
-				/*return_map.put("cho",(int)cho);
-				return_map.put("jun",(int)jun);
-				return_map.put("jon",(int)jon);*/
-				
-				//데이터베이스에서 초성, 중성, 종성을 가져오는 그릇.
-				List<Map<String,Object>> return_db;
 				
 				
 				//초성
-				return_db=hanguldao.getCho((int)cho);				
-				return_map.put("cho", process(return_db));
+				return_db=hanguldao.getCho((int)cho);
+				JsonObject stroke_jsonObject=new JsonObject();
+				String stroke_amount="";
+				stroke_amount+=(return_db.get(0).get("stroke_amount").toString()+",");
+					
+				JsonObject word_jsonObject;
+				process(return_db,word_unit_jsonArray);
 				
 				
 				//중성
-				return_db=hanguldao.getJun((int)jun);				
-				return_map.put("jun", process(return_db));
+				return_db=hanguldao.getJun((int)jun);	
+				stroke_amount+=(return_db.get(0).get("stroke_amount").toString());
+				process(return_db,word_unit_jsonArray);
 				
 				
 				//종성
 				if((int)jon!=0) {
 					return_db=hanguldao.getJon((int)jon);
-					return_map.put("jon", process(return_db));
+					stroke_amount+=(","+return_db.get(0).get("stroke_amount").toString());
+					process(return_db,word_unit_jsonArray);
+					
 				}
-				return_list.add(return_map);
+				stroke_jsonObject.addProperty("stroke", stroke_amount);
+				wordJsonArr.add(word_unit_jsonArray);
+				strokeJsonArr.add(stroke_jsonObject);
+				
 			}
 		}
-		for(int i=0;i<return_list.size();i++) {
-			System.out.println(return_list.get(i));
-		}
-		hangulVO.setHangul_map_list(return_list);
-		return hangulVO;
+		jsonObject.add("word", wordJsonArr);
+		jsonObject.add("stroke", strokeJsonArr);
+		
+		System.out.println(jsonObject);
+		return jsonObject;
 	}
-	private JsonArray process(List<Map<String,Object>> return_db) {
-		JsonArray ja=new JsonArray();
+	private void process(List<Map<String,Object>> return_db,JsonArray ja) {
+		
 		for(int j=0;j<return_db.size();j++) {
 			JsonObject jo=new JsonObject();
 			jo.addProperty("x1",  return_db.get(j).get("x1")+"");
@@ -102,7 +107,7 @@ public class HangulService {
 			jo.addProperty("y2",  return_db.get(j).get("y2")+"");
 			ja.add(jo);
 		}
-		return ja;
+		
 	}
 
 }

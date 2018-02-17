@@ -5,12 +5,12 @@
 
 	<select id="select_cho_List" resultType="hashmap" parameterType="Integer">
 			<![CDATA[
-				SELECT
-				    *
-				FROM
-				    hangul.cho	
-				WHERE 
-					cho_num=#{cho_num} order by cho_stroke_num;
+				SELECT 
+					*
+				FROM 
+					hangul.cho c, hangul.stroke s 
+				where 
+					c.cho_num=#{cho_num} and c.cho_stroke_num=s.stroke_num order by s.stroke_order;
 							
 			]]>
 	</select>

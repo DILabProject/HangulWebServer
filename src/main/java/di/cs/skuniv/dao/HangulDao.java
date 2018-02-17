@@ -12,7 +12,6 @@ import di.cs.skuniv.connect.ConnectDB;
 public class HangulDao extends ConnectDB {
 
 	public List<Map<String, Object>> getCho(int cho) {
-		
 		return (List<Map<String, Object>>)selectList("cho.select_cho_List", cho);
 	}
 

@@ -1,4 +1,4 @@
-<%@page import="di.cs.skuniv.model.HangulVO"%>
+
 <%@page import="com.google.gson.Gson"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -12,9 +12,9 @@
 <%
 	Gson gson=new Gson();
 	String str_HangulVO=(String)request.getAttribute("str_HangulVO");
-	HangulVO hangulVO=gson.fromJson(str_HangulVO, HangulVO.class);
+	/* HangulVO hangulVO=gson.fromJson(str_HangulVO, HangulVO.class);
 	
-	System.out.println(hangulVO.getHangul_map_list().get(0).get("cho").toString());
+	System.out.println(hangulVO.getHangul_map_list().get(0).get("cho").toString()); */
 %>
 <h1>
 완료 되었습니다.
