@@ -16,12 +16,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-
+import di.cs.skuniv.model.HangulVO;
 import di.cs.skuniv.service.HangulService;
 
 /**
@@ -39,16 +40,16 @@ public class HangulController {
 		return "hangul_input";
 		
 	}
-	@RequestMapping(value = "/hangul_input_complete")
-	public String hangul_input_complete(HttpServletRequest request) throws UnsupportedEncodingException {
+	@RequestMapping(value = "/hangul_input_complete",method = RequestMethod.POST)
+	public @ResponseBody String hangul_input_complete(HttpServletRequest request) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
+		System.out.println("hangul");
 		Gson gson=new Gson();
-		String input=request.getParameter("input");
-		JsonObject jsonObject=hangulservice.getHangul(input);
-		
-		String str_HangulVO=gson.toJson(jsonObject);
-		request.setAttribute("str_HangulVO", str_HangulVO);
-		return "hangul_input_complete";
+		String input=request.getParameter("day");
+		HangulVO hangulVO=hangulservice.getHangul("간다");		
+		String str_HangulVO=gson.toJson(hangulVO);
+		System.out.println(str_HangulVO);		
+		return str_HangulVO;
 		
 	}
 	

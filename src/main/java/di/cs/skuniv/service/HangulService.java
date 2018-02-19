@@ -13,6 +13,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import di.cs.skuniv.dao.HangulDao;
+import di.cs.skuniv.model.DrawVO;
+import di.cs.skuniv.model.HangulVO;
 
 
 @Service("HangulService")
@@ -32,10 +34,13 @@ public class HangulService {
 	@Resource(name="HangulDao")
 	private HangulDao hanguldao;
 
-	public JsonObject getHangul(String input) {
-		JsonObject jsonObject=new JsonObject();
-		JsonArray wordJsonArr=new JsonArray();
-		JsonArray strokeJsonArr=new JsonArray();
+	public HangulVO getHangul(String input) {
+		
+		HangulVO hangulVO=new HangulVO();
+		
+		List<List<DrawVO>> word=new ArrayList<List<DrawVO>>();
+		List<String> stroke=new ArrayList<String>();
+		
 		
 		String tempStr=input;
 		String lastStr="";
@@ -43,7 +48,7 @@ public class HangulService {
 		System.out.println(tempStr);
 		List<Map<String,Object>> return_db;
 		for(int i=0;i<tempStr.length();i++) {
-			JsonArray word_unit_jsonArray=new JsonArray();
+			List<DrawVO> word_unit_jsonArray=new ArrayList<DrawVO>();
 			
 			char test=tempStr.charAt(i);
 			
@@ -85,26 +90,26 @@ public class HangulService {
 					process(return_db,word_unit_jsonArray);
 					
 				}
-				stroke_jsonObject.addProperty("stroke", stroke_amount);
-				wordJsonArr.add(word_unit_jsonArray);
-				strokeJsonArr.add(stroke_jsonObject);
+				
+				word.add(word_unit_jsonArray);
+				stroke.add(stroke_amount);
 				
 			}
 		}
-		jsonObject.add("word", wordJsonArr);
-		jsonObject.add("stroke", strokeJsonArr);
+		hangulVO.setWord(word);
+		hangulVO.setStroke(stroke);
 		
-		System.out.println(jsonObject);
-		return jsonObject;
+		System.out.println(hangulVO);
+		return hangulVO;
 	}
-	private void process(List<Map<String,Object>> return_db,JsonArray ja) {
+	private void process(List<Map<String,Object>> return_db,List<DrawVO> ja) {
 		
 		for(int j=0;j<return_db.size();j++) {
-			JsonObject jo=new JsonObject();
-			jo.addProperty("x1",  return_db.get(j).get("x1")+"");
-			jo.addProperty("y1",  return_db.get(j).get("y1")+"");
-			jo.addProperty("x2",  return_db.get(j).get("x2")+"");
-			jo.addProperty("y2",  return_db.get(j).get("y2")+"");
+			DrawVO jo=new DrawVO();
+			jo.setX1(return_db.get(j).get("x1")+"");
+			jo.setY1(return_db.get(j).get("y1")+"");
+			jo.setX2(return_db.get(j).get("x2")+"");
+			jo.setY2(return_db.get(j).get("y2")+"");
 			ja.add(jo);
 		}
 		
