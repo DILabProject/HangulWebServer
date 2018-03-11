@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="WrongCount">
+
+	<select id="selectWrongCount" resultType="hashmap"
+		parameterType="di.cs.skuniv.model.WrongCountVo">
+	
+			<![CDATA[
+				SELECT 
+					*
+				FROM 
+					hangul.wrongcount
+				where 
+					id=#{id} and letter=#{letter}
+							
+			]]>
+	</select>
+	<insert id="insertWrongCount"
+		parameterType="di.cs.skuniv.model.WrongCountVo">
+	
+			<![CDATA[
+				INSERT 
+				INTO 
+					hangul.wrongcount (id,letter,count)
+				VALUES
+				 	(#{id},#{letter},#{count})	
+							
+			]]>
+
+	</insert>
+	<update id="updateWrongCount"
+		parameterType="di.cs.skuniv.model.WrongCountVo">
+	
+			<![CDATA[
+				UPDATE 
+					hangul.wrongcount
+				SET 
+					count= count+#{count}
+				WHERE
+				 	id=#{id}
+							
+			]]>
+
+	</update>
+
+</mapper>
