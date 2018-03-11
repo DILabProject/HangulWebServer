@@ -50,7 +50,18 @@ public class HangulController {
 		String str_HangulVO=gson.toJson(hangulVO);
 		System.out.println(str_HangulVO);		
 		return str_HangulVO;
+	}
+	@RequestMapping(value = "/login",method = RequestMethod.POST)
+	public @ResponseBody boolean login(HttpServletRequest request) throws UnsupportedEncodingException {
+		request.setCharacterEncoding("UTF-8");
+		System.out.println("login");
 		
+		String id=request.getParameter("id");
+		String password=request.getParameter("password");
+		
+		boolean login=hangulservice.login(id,password);
+		System.out.println(login);
+		return login;
 	}
 	
 }
