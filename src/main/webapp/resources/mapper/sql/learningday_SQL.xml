@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LearningDay">
+
+	<select id="getLearningDay" resultType="hashmap">
+	
+			<![CDATA[
+				SELECT 
+					*
+				FROM 
+					hangul.learningday
+				
+							
+			]]>
+	</select>
+	<select id="getUserLearningList" resultType="hashmap" parameterType="String">
+	
+			<![CDATA[
+				select
+					ul.id,ld.day,ld.word,ul.checkword 
+				from 
+					user_learning ul, learningday ld 
+				where ul.id=#{id} and ul.day=ld.day;
+				
+							
+			]]>
+	</select>
+	<update id="updateStudyCheck"  parameterType="di.cs.skuniv.model.StudyListVo">
+	
+			<![CDATA[
+				UPDATE
+					hangul.user_learning
+				SET
+					checkword='1'
+				WHERE
+					id=#{id} and day=#{day};
+				
+							
+			]]>
+	</update>
+	
+
+
+</mapper>

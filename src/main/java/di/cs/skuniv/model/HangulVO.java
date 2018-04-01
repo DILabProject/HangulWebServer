@@ -4,7 +4,7 @@ import java.util.List;
 
 public class HangulVO {
 	List<List<DrawVO>> word;
-	List<String> stroke;
+	List<List<LetterVo>> stroke;
 	
 	
 	public List<List<DrawVO>> getWord() {
@@ -13,10 +13,11 @@ public class HangulVO {
 	public void setWord(List<List<DrawVO>> word) {
 		this.word = word;
 	}
-	public List<String> getStroke() {
+	public List<List<LetterVo>> getStroke() {
 		return stroke;
 	}
-	public void setStroke(List<String> stroke) {
+	public void setStroke(List<List<LetterVo>> stroke) {
 		this.stroke = stroke;
 	}
+	
 }

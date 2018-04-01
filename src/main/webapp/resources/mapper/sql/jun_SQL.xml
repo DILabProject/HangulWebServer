@@ -3,14 +3,14 @@
 
 <mapper namespace="jun">
 
-	<select id="select_jun_List" resultType="hashmap" parameterType="Integer">
+	<select id="select_jun_List" resultType="hashmap" parameterType="di.cs.skuniv.model.JudgeVo">
 			<![CDATA[
 				SELECT 
 					*
 				FROM 
 					hangul.jun j, hangul.stroke s 
 				where 
-					j.jun_num=#{jun_num} and j.jun_stroke_num=s.stroke_num order by s.stroke_order;
+					j.jun_num=#{intJun} and j.jon_judge=#{intJon} andj.jun_stroke_num=s.stroke_num order by s.stroke_order;
 							
 			]]>
 	</select>

@@ -1,21 +1,24 @@
 package di.cs.skuniv.model;
 
-public class WrongCountVo {
-	private String id;
+public class LetterVo {
 	private String letter;
+	private int strokeNum;
 	
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
+	
+
 	public String getLetter() {
 		return letter;
 	}
 	public void setLetter(String letter) {
 		this.letter = letter;
 	}
+	public int getStrokeNum() {
+		return strokeNum;
+	}
+	public void setStrokeNum(int strokeNum) {
+		this.strokeNum = strokeNum;
+	}
+
 	
 	
 	

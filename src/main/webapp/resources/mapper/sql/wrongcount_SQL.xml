@@ -22,26 +22,13 @@
 			<![CDATA[
 				INSERT 
 				INTO 
-					hangul.wrongcount (id,letter,count)
+					hangul.wrongcount (id,letter)
 				VALUES
-				 	(#{id},#{letter},#{count})	
+				 	(#{id},#{letter})	
 							
 			]]>
 
 	</insert>
-	<update id="updateWrongCount"
-		parameterType="di.cs.skuniv.model.WrongCountVo">
 	
-			<![CDATA[
-				UPDATE 
-					hangul.wrongcount
-				SET 
-					count= count+#{count}
-				WHERE
-				 	id=#{id}
-							
-			]]>
-
-	</update>
 
 </mapper>

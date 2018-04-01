@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import di.cs.skuniv.model.HangulVO;
+import di.cs.skuniv.model.StudyListVo;
 import di.cs.skuniv.model.UserVo;
 import di.cs.skuniv.model.WrongCountVo;
 import di.cs.skuniv.service.HangulService;
@@ -42,35 +44,48 @@ public class HangulController {
 		return "hangul_input";
 		
 	}
-	@RequestMapping(value = "/hangul_input_complete",method = RequestMethod.POST)
-	public @ResponseBody String hangul_input_complete(HttpServletRequest request) throws UnsupportedEncodingException {
+	@RequestMapping(value = "/hangul_input_complete",method = RequestMethod.POST,produces="text/plain;charset=UTF-8")
+
+	public @ResponseBody String hangul_input_complete(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		
 		System.out.println("hangul");
 		Gson gson=new Gson();
-		String input=request.getParameter("day");
-		HangulVO hangulVO=hangulservice.getHangul("간다");		
+		String word=request.getParameter("word");
+		HangulVO hangulVO=hangulservice.getHangul(word);		
 		String str_HangulVO=gson.toJson(hangulVO);
+		
 		System.out.println(str_HangulVO);		
 		return str_HangulVO;
 		
 	}
 	//로그인을 위한 웹서버 매핑
-	@RequestMapping(value = "/signIn",method = RequestMethod.POST)
-	public @ResponseBody String signin(HttpServletRequest request) throws UnsupportedEncodingException {
+	@RequestMapping(value = "/signIn",method = RequestMethod.POST,produces="text/plain;charset=UTF-8")
+	public @ResponseBody String signin(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
 		System.out.println("signin");
 		Gson gson=new Gson();
 		//사용자의 아이디와 비밀번호를 전달 받는다.
 		String id=request.getParameter("id");
 		String password=request.getParameter("password");
-		
+		System.out.println(id +"=="+password);
 		
 		Map<String, Object> user=hangulservice.login(id,password);
 		
 		//해당하는 사용자가 있을경우 정보를 줌, 없으면 null값이다.
 		String strUser=gson.toJson(user);
 		System.out.println(strUser);
-		return strUser;
+		
+		if(!strUser.equals("null")) {
+			System.out.println("1");
+			return "1";
+		}else {
+			System.out.println("0");
+			return "0";
+		}
+		
 	}
 	
 	//회원가입 서버 매핑
@@ -80,19 +95,10 @@ public class HangulController {
 		System.out.println("signup");
 		Gson gson=new Gson();
 		
-		//사용자의 아이디와 비밀번호를 전달 받는다.
-		String id=request.getParameter("id");
-		String password=request.getParameter("password");
-		String gender=request.getParameter("gender");
-		String age=request.getParameter("age");
-		String name=request.getParameter("name");
 		
-		UserVo user=new UserVo();
-		user.setGender(gender);
-		user.setId(id);
-		user.setName(name);
-		user.setPassword(password);
-		user.setAge(age);
+		String strUser=request.getParameter("userVO");
+		UserVo user=gson.fromJson(strUser, UserVo.class);
+		
 		//전달받은 값을 DB에 추가한다.
 		hangulservice.signUp(user);
 	}
@@ -106,14 +112,47 @@ public class HangulController {
 		//사용자의 아이디, 문자, 횟수를 받는다.
 		String id=request.getParameter("id");
 		String letter=request.getParameter("letter");
-		int count=Integer.parseInt(request.getParameter("count"));
+		WrongCountVo wrongCountVo=new WrongCountVo();
+		wrongCountVo.setId(id);
+		wrongCountVo.setLetter(letter);
+		hangulservice.wrongCount(wrongCountVo);
+	}
+	@RequestMapping(value = "/studyList",method = RequestMethod.POST,produces="text/plain;charset=UTF-8")
+	public @ResponseBody String userLearningDay(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		System.out.println("studyList");
+		Gson gson=new Gson();
 		
-		WrongCountVo wrongCount=new WrongCountVo();
-		wrongCount.setCount(count);
-		wrongCount.setId(id);
-		wrongCount.setLetter(letter);
-		//전달받은 값을 DB에 추가한다.
-		hangulservice.wrongCount(wrongCount);
+		//사용자의 아이디, 문자, 횟수를 받는다.
+		String id=request.getParameter("id");
+		List<StudyListVo> stydyListVo=hangulservice.getUserLearningList(id);
+		
+		String strstydyListVo=gson.toJson(stydyListVo);
+		
+		System.out.println(strstydyListVo);
+		return (strstydyListVo);
+		
+	}
+	@RequestMapping(value = "/finishStudy",method = RequestMethod.POST,produces="text/plain;charset=UTF-8")
+	public @ResponseBody void finishStudy(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		System.out.println("finishStudy");
+		Gson gson=new Gson();
+		
+		//사용자의 아이디, 문자, 횟수를 받는다.
+		String id=request.getParameter("id");
+		String day=request.getParameter("day");
+		
+		StudyListVo studyListVo=new StudyListVo();
+		studyListVo.setId(id);
+		studyListVo.setDay(day);
+		
+		hangulservice.updateStudyCheck(studyListVo);
+		
+		
+		
 	}
 	
 }
