@@ -45,10 +45,10 @@ public class HangulController {
 		
 	}
 	@RequestMapping(value = "/hangul_input_complete",method = RequestMethod.POST,produces="text/plain;charset=UTF-8")
-
 	public @ResponseBody String hangul_input_complete(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
+		
 		
 		System.out.println("hangul");
 		Gson gson=new Gson();

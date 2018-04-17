@@ -10,7 +10,7 @@
 				FROM 
 					hangul.jon j, hangul.stroke s 
 				where 
-					j.jon_num=#{intJon} and j.jun_judge=#{intJun} andj.jon_stroke_num=s.stroke_num order by s.stroke_order;
+					j.jon_num=#{intJon} and j.jun_judge=#{intJun} and j.jon_stroke_num=s.stroke_num order by s.stroke_order;
 							
 			]]>
 	</select>

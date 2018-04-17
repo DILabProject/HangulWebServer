@@ -144,8 +144,10 @@ public class HangulService {
 		List<Map<String, Object>> return_db;
 		JudgeVo judgeVo;
 		if(judge==0) {
+			System.out.println(intCho);
 			judgeVo=new JudgeVo(intCho, junDataBaseNum, 0);	
 		}else {
+			System.out.println(intCho);
 			judgeVo=new JudgeVo(intCho, junDataBaseNum, 1);
 		}
 		
@@ -167,7 +169,9 @@ public class HangulService {
 
 		
 		if(judge==0) {
-			judgeVo=new JudgeVo(0, intJun, 0);	
+			System.out.println(intJun);
+			judgeVo=new JudgeVo(0, intJun, 0);
+			System.out.println(intJun);
 		}else {
 			judgeVo=new JudgeVo(0, intJun, 1);
 		}
@@ -188,6 +192,7 @@ public class HangulService {
 
 		// 종성이 있으면
 		if (judge == 1) {
+			System.out.println(intJon);
 			judgeVo=new JudgeVo(0, junDataBaseNum, intJon);	
 			
 			return_db = hanguldao.getJon(judgeVo);
