@@ -16,8 +16,4 @@ public class WrongCountVo {
 	public void setLetter(String letter) {
 		this.letter = letter;
 	}
-	
-	
-	
-
 }

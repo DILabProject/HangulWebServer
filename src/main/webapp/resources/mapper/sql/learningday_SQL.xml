@@ -35,11 +35,38 @@
 					checkword='1'
 				WHERE
 					id=#{id} and day=#{day};
-				
-							
 			]]>
 	</update>
+	<select id="getDateWordListByDate" resultType="di.cs.skuniv.model.StudyListVo" parameterType="di.cs.skuniv.model.StudyListVo">
 	
-
-
+			<![CDATA[
+				select
+					my_day as day,
+					num as num,
+					word as word,
+					user_id as id,
+					check_word as checkword
+				from 
+					 hangul.learningday
+				where 
+					my_day=#{day};
+			]]>
+	</select>
+	<select id="getDateWordList" resultType="di.cs.skuniv.model.StudyListVo" parameterType="di.cs.skuniv.model.StudyListVo">
+	
+			<![CDATA[
+				select
+					my_day as day,
+					num as num,
+					word as word,
+					user_id as id,
+					check_word as checkword
+				from 
+					 hangul.learningday
+				where 
+					my_day=#{day}
+					and 
+					user_id=#{id};
+			]]>
+	</select>
 </mapper>

@@ -2,12 +2,12 @@ package di.cs.skuniv.model;
 
 import java.util.List;
 import java.util.Map;
-
 public class StudyListVo {
-	private String id;
+    private String id;
 	private String day;
+	private int num;
 	private String word;
-	private String checkword;
+    private String checkword;
 	public String getId() {
 		return id;
 	}
@@ -19,6 +19,12 @@ public class StudyListVo {
 	}
 	public void setDay(String day) {
 		this.day = day;
+	}
+	public int getNum() {
+		return num;
+	}
+	public void setNum(int num) {
+		this.num = num;
 	}
 	public String getWord() {
 		return word;
@@ -32,12 +38,6 @@ public class StudyListVo {
 	public void setCheckword(String checkword) {
 		this.checkword = checkword;
 	}
-	
-	
-	
-	
 
-
-	
-
+    
 }

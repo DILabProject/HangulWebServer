@@ -18,6 +18,7 @@ import di.cs.skuniv.model.HangulVO;
 import di.cs.skuniv.model.JudgeVo;
 import di.cs.skuniv.model.LetterVo;
 import di.cs.skuniv.model.StudyListVo;
+import di.cs.skuniv.model.StudyListVo;
 import di.cs.skuniv.model.UserVo;
 import di.cs.skuniv.model.WrongCountVo;
 import di.cs.skuniv.model.UserVo;
@@ -102,7 +103,6 @@ public class HangulService {
 	}
 
 	public Map<String, Object> login(String id, String password) {
-
 		// id,password가 있는 loginModel을 세운다.
 		UserVo userVo = new UserVo();
 		userVo.setId(id);
@@ -214,9 +214,7 @@ public class HangulService {
 		word.add(word_unit_jsonArray);
 	}
 	private void judgmentJun(List<DrawVO> word_unit_jsonArray ,List<LetterVo> stroke_unit, List<List<DrawVO>> word,List<List<LetterVo>> stroke,int intCho,int intJun,int intJon,int judge) {
-		
-		
-		
+	
 		// ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅣ -> DB 중성 종류 1
 		if (intJun == 0 || intJun == 1 || intJun == 2 || intJun == 3 || intJun == 4 || intJun == 5
 				|| intJun == 6 || intJun == 7 || intJun == 20) {
@@ -236,4 +234,7 @@ public class HangulService {
 		}
 	}
 
+	public List<StudyListVo> getDateLearningWordList(StudyListVo studyListVo) {
+		return hanguldao.getDateLearningWordList(studyListVo);
+	}
 }

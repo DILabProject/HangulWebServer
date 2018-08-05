@@ -62,11 +62,10 @@ public class HangulDao extends ConnectDB {
 
 	public void updateStudyCheck(StudyListVo studyListVo) {
 		update("LearningDay.updateStudyCheck",studyListVo);
-		
 	}
 
 	
-
-	
-
+	public List<StudyListVo> getDateLearningWordList(StudyListVo studyListVo) {
+		return (List<StudyListVo>) selectList("LearningDay.getDateWordList",studyListVo);
+	}
 }

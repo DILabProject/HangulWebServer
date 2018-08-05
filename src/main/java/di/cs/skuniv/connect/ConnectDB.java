@@ -21,7 +21,7 @@ public class ConnectDB {
 		return sqlSession.delete(queryId, params);
 	}
 	
-	public Object selectOne(String queryId){
+	public Object selectOne(String queryId){       
 		return sqlSession.selectOne(queryId);
 	}
 	

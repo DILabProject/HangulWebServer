@@ -15,9 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -37,7 +41,6 @@ public class HangulController {
 	
 	@Resource(name="HangulService")
 	private HangulService hangulservice;
-	
 	
 	@RequestMapping(value = "/hangul_input")
 	public String hangul_input(HttpServletRequest request) {
@@ -117,16 +120,21 @@ public class HangulController {
 		wrongCountVo.setLetter(letter);
 		hangulservice.wrongCount(wrongCountVo);
 	}
+	
 	@RequestMapping(value = "/studyList",method = RequestMethod.POST,produces="text/plain;charset=UTF-8")
 	public @ResponseBody String userLearningDay(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		System.out.println("studyList");
 		Gson gson=new Gson();
-		
+		StudyListVo studyListVo = new StudyListVo();
 		//사용자의 아이디, 문자, 횟수를 받는다.
+		String date=request.getParameter("day");
 		String id=request.getParameter("id");
-		List<StudyListVo> stydyListVo=hangulservice.getUserLearningList(id);
+		studyListVo.setDay(date);
+		studyListVo.setId(id);
+		
+		List<StudyListVo> stydyListVo=hangulservice.getDateLearningWordList(studyListVo);
 		
 		String strstydyListVo=gson.toJson(stydyListVo);
 		
@@ -150,9 +158,14 @@ public class HangulController {
 		studyListVo.setDay(day);
 		
 		hangulservice.updateStudyCheck(studyListVo);
-		
-		
-		
 	}
-	
+	@RequestMapping(value="/select_date")
+	public ModelAndView selectDate(@RequestParam("date") String date,ModelAndView modelAndView) {
+		modelAndView.setViewName("hangul_input_complete");
+		StudyListVo studyListVo = new StudyListVo();
+		studyListVo.setDay(date);
+		List<StudyListVo> dateLearningWordList = hangulservice.getDateLearningWordList(studyListVo);
+		modelAndView.addObject("dateWordList", dateLearningWordList);
+		return modelAndView;
+	}	
 }
