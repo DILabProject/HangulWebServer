@@ -3,6 +3,16 @@
 
 <mapper namespace="User">
 
+
+	<select id="selectUser" resultType="di.cs.skuniv.model.UserVo">
+	
+			<![CDATA[
+				SELECT 
+					*
+				FROM 
+					hangul.user			
+			]]>
+	</select>
 	<select id="signIn" resultType="hashmap" parameterType="di.cs.skuniv.model.UserVo">
 	
 			<![CDATA[

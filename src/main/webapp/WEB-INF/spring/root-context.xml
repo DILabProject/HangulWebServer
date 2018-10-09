@@ -14,4 +14,8 @@
 		class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
 		<property name="contentType" value="text/html;charset=UTF-8" />
 	</bean>
+	
+	<bean id="gson"
+		class="com.google.gson.Gson">
+	</bean>
 </beans>

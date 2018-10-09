@@ -1,43 +1,58 @@
 package di.cs.skuniv.model;
 
-import java.util.List;
-import java.util.Map;
+
+
 public class StudyListVo {
     private String id;
-	private String day;
-	private int num;
+	private int day;
 	private String word;
     private String checkword;
+    
+    public StudyListVo() {	
+	}
+
+	public StudyListVo(int day, String word) {
+		this.day = day;
+		this.word = word;
+	}
+	
+	public StudyListVo(String id, int day, String word) {
+		this.id = id;
+		this.day = day;
+		this.word = word;
+	}
+
 	public String getId() {
 		return id;
 	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
-	public String getDay() {
+
+	public int getDay() {
 		return day;
 	}
-	public void setDay(String day) {
+
+	public void setDay(int day) {
 		this.day = day;
 	}
-	public int getNum() {
-		return num;
-	}
-	public void setNum(int num) {
-		this.num = num;
-	}
+
 	public String getWord() {
 		return word;
 	}
+
 	public void setWord(String word) {
 		this.word = word;
 	}
+
 	public String getCheckword() {
 		return checkword;
 	}
+
 	public void setCheckword(String checkword) {
 		this.checkword = checkword;
 	}
-
-    
+	
+	
 }

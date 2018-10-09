@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="DayWord">
+
+	<select id="getDayWordList" parameterType="String"
+		resultType="di.cs.skuniv.model.DayWordVo">
+			<![CDATA[
+				SELECT 
+					*
+				FROM 
+					hangul.day_word
+				WHERE
+					num=#{num}
+				order by difficulty asc
+			]]>
+	</select>
+	<insert id="create" parameterType="di.cs.skuniv.model.DayWordVo">
+				<![CDATA[
+					INSERT INTO 
+						hangul.day_word (num,word) 
+					VALUES (#{num}, #{word});
+				]]>
+	</insert>
+	<delete id="delete" parameterType="di.cs.skuniv.model.DayWordVo">
+				<![CDATA[
+					DELETE FROM hangul.day_word
+					WHERE num=#{num} and word=#{word};
+				]]>
+	</delete>
+</mapper>

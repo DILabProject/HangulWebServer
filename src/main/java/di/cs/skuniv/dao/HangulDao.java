@@ -5,8 +5,13 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
+import com.google.gson.Gson;
+
 import di.cs.skuniv.connect.ConnectDB;
+import di.cs.skuniv.model.DayVo;
+import di.cs.skuniv.model.DayWordVo;
 import di.cs.skuniv.model.JudgeVo;
+import di.cs.skuniv.model.LevelVo;
 import di.cs.skuniv.model.StudyListVo;
 import di.cs.skuniv.model.UserVo;
 import di.cs.skuniv.model.WrongCountVo;
@@ -50,10 +55,6 @@ public class HangulDao extends ConnectDB {
 		
 	}
 
-	public void createUserLearning(UserVo userVo) {
-		insert("User.createUserLearning",userVo);
-		
-	}
 
 	public List<Map<String, Object>> getUserLearningList(String id) {
 		// TODO Auto-generated method stub
@@ -61,11 +62,73 @@ public class HangulDao extends ConnectDB {
 	}
 
 	public void updateStudyCheck(StudyListVo studyListVo) {
+		Gson gson = new Gson();
+		System.out.println(gson.toJson(studyListVo));
 		update("LearningDay.updateStudyCheck",studyListVo);
 	}
 
 	
 	public List<StudyListVo> getDateLearningWordList(StudyListVo studyListVo) {
 		return (List<StudyListVo>) selectList("LearningDay.getDateWordList",studyListVo);
+	}
+
+	public List<StudyListVo> getDateLearningWordListByDate(StudyListVo studyListVo) {
+		return (List<StudyListVo>) selectList("LearningDay.getDateWordListByDate",studyListVo);
+		
+	}
+
+	public void createWordByDate(StudyListVo studyListVo) {
+		insert("LearningDay.createWordByDate", studyListVo);
+		
+	}
+
+	public List<DayVo> getDayList() {
+		return (List<DayVo>)selectList("Day.getDayList");
+	}
+
+	public List<DayWordVo> getDayWordList(String day) {
+		return (List<DayWordVo>)selectList("DayWord.getDayWordList",day);
+	}
+
+	public void createDay(DayVo dayVo) {
+		insert("Day.create", dayVo);
+	}
+
+	public void addWord(DayWordVo dayWordVo) {
+		insert("DayWord.create", dayWordVo);
+	}
+
+	public void deleteWord(DayWordVo dayWordVo) {
+		delete("DayWord.delete", dayWordVo);
+		
+	}
+
+	public void addStudyUserVo(StudyListVo studyListVo) {
+		insert("LearningDay.addStudyUser", studyListVo);
+	}
+
+	public void removeLearning(StudyListVo studyListVo) {
+		delete("LearningDay.delete", studyListVo);
+		
+	}
+
+	public List<StudyListVo> getLeanrningDay() {
+		return (List<StudyListVo>)selectList("LearningDay.getLearningDay");
+	}
+
+	public void insertUserOnLeanrningDay(StudyListVo studyListVo) {
+		insert("LearningDay.userOnLeanrningDay", studyListVo);
+	}
+
+	public List<UserVo> selectUser() {
+		return (List<UserVo>)selectList("User.selectUser");
+	}
+
+	public List<LevelVo> getLevelList(String id) {
+		return (List<LevelVo>)selectList("LearningDay.selectLevel",id);
+	}
+
+	public List<StudyListVo> getWordList(StudyListVo studyListVo) {
+		return (List<StudyListVo>)selectList("LearningDay.getWordList",studyListVo);
 	}
 }

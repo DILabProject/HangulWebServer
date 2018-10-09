@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Day">
+
+	<select id="getDayList" resultType="di.cs.skuniv.model.DayVo">
+			<![CDATA[
+				SELECT 
+					num,name
+				FROM 
+					hangul.day
+			]]>
+	</select>
+	<insert id="create" parameterType="di.cs.skuniv.model.DayVo">
+			<![CDATA[
+				INSERT INTO 
+					hangul.day (num,name) 
+				VALUES (#{num}, #{name});
+			]]>
+	</insert>
+
+</mapper>

@@ -1,21 +1,16 @@
 package di.cs.skuniv.controller;
 
 import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,10 +19,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
+import di.cs.skuniv.model.DayVo;
+import di.cs.skuniv.model.DayWordVo;
 import di.cs.skuniv.model.HangulVO;
+import di.cs.skuniv.model.LevelVo;
 import di.cs.skuniv.model.StudyListVo;
 import di.cs.skuniv.model.UserVo;
 import di.cs.skuniv.model.WrongCountVo;
@@ -39,22 +35,63 @@ import di.cs.skuniv.service.HangulService;
 @Controller
 public class HangulController {
 	
+	@Autowired
+	private Gson gson;
+	
 	@Resource(name="HangulService")
 	private HangulService hangulservice;
 	
 	@RequestMapping(value = "/hangul_input")
 	public String hangul_input(HttpServletRequest request) {
+		List<DayVo> list = hangulservice.getDayList();
+		request.setAttribute("list", list);
 		return "hangul_input";
+	}
+	@RequestMapping(value = "/add-day/{size}")
+	public String addDay(HttpServletRequest request,@PathVariable("size") int size) {
+		hangulservice.createDay(size+1);
+		List<DayVo> list = hangulservice.getDayList();
+		request.setAttribute("list", list);
+		return "redirect:/hangul_input";
 		
 	}
+	@RequestMapping(value = "/addWord")
+	public String addWord(HttpServletRequest request) {
+		int day= Integer.parseInt(request.getParameter("day"));
+		String word=request.getParameter("word");
+		hangulservice.addWord(new DayWordVo(day, word));
+		
+//		hangulservice.addStudyUserVo(new StudyListVo("aaa",day,word));
+		List<DayVo> list = hangulservice.getDayList();
+		request.setAttribute("list", list);
+		return "redirect:/hangul_input";
+	}
+	@RequestMapping(value = "/deleteWord")
+	public String deleteWord(HttpServletRequest request) {
+		int day= Integer.parseInt(request.getParameter("day"));
+		String word=request.getParameter("word");
+		hangulservice.deleteWord(new DayWordVo(day, word));
+		hangulservice.deleteWord(new StudyListVo(day,word));
+		List<DayVo> list = hangulservice.getDayList();
+		request.setAttribute("list", list);
+		return "redirect:/hangul_input";
+	}
+	@RequestMapping(value = "/selectDay/{day}",produces="text/plain;charset=UTF-8")
+	public @ResponseBody String selectDay(HttpServletRequest request,@PathVariable("day") String day) {
+		List<DayWordVo> list = hangulservice.getDayWordList(day);
+		return gson.toJson(list);
+		
+	}
+	
+	
+	
 	@RequestMapping(value = "/hangul_input_complete",method = RequestMethod.POST,produces="text/plain;charset=UTF-8")
 	public @ResponseBody String hangul_input_complete(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		
-		
 		System.out.println("hangul");
-		Gson gson=new Gson();
+		
 		String word=request.getParameter("word");
 		HangulVO hangulVO=hangulservice.getHangul(word);		
 		String str_HangulVO=gson.toJson(hangulVO);
@@ -69,7 +106,6 @@ public class HangulController {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		System.out.println("signin");
-		Gson gson=new Gson();
 		//사용자의 아이디와 비밀번호를 전달 받는다.
 		String id=request.getParameter("id");
 		String password=request.getParameter("password");
@@ -96,8 +132,6 @@ public class HangulController {
 	public @ResponseBody void signup(HttpServletRequest request) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
 		System.out.println("signup");
-		Gson gson=new Gson();
-		
 		
 		String strUser=request.getParameter("userVO");
 		UserVo user=gson.fromJson(strUser, UserVo.class);
@@ -110,7 +144,7 @@ public class HangulController {
 	public @ResponseBody void wrongcount(HttpServletRequest request) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
 		System.out.println("wrongcount");
-		Gson gson=new Gson();
+		
 		
 		//사용자의 아이디, 문자, 횟수를 받는다.
 		String id=request.getParameter("id");
@@ -125,47 +159,89 @@ public class HangulController {
 	public @ResponseBody String userLearningDay(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		System.out.println("studyList");
-		Gson gson=new Gson();
+		System.out.println("studyList");		
 		StudyListVo studyListVo = new StudyListVo();
 		//사용자의 아이디, 문자, 횟수를 받는다.
-		String date=request.getParameter("day");
+		
 		String id=request.getParameter("id");
-		studyListVo.setDay(date);
+		int day = Integer.parseInt(request.getParameter("day"));
 		studyListVo.setId(id);
+		studyListVo.setDay(day);
+		System.out.println(id);
+		List<StudyListVo> stydyListVoList=hangulservice.getDateLearningWordList(studyListVo);
 		
-		List<StudyListVo> stydyListVo=hangulservice.getDateLearningWordList(studyListVo);
-		
-		String strstydyListVo=gson.toJson(stydyListVo);
+		String strstydyListVo=gson.toJson(stydyListVoList);
 		
 		System.out.println(strstydyListVo);
 		return (strstydyListVo);
 		
 	}
 	@RequestMapping(value = "/finishStudy",method = RequestMethod.POST,produces="text/plain;charset=UTF-8")
-	public @ResponseBody void finishStudy(HttpServletRequest request,HttpServletResponse response) throws UnsupportedEncodingException {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+	public @ResponseBody void finishStudy(HttpServletRequest request) throws UnsupportedEncodingException{
 		System.out.println("finishStudy");
-		Gson gson=new Gson();
-		
-		//사용자의 아이디, 문자, 횟수를 받는다.
-		String id=request.getParameter("id");
-		String day=request.getParameter("day");
-		
-		StudyListVo studyListVo=new StudyListVo();
-		studyListVo.setId(id);
-		studyListVo.setDay(day);
-		
+		request.setCharacterEncoding("UTF-8");
+		String word = request.getParameter("word");
+		String id = request.getParameter("id");
+		int day= Integer.parseInt(request.getParameter("day"));
+		StudyListVo studyListVo = new StudyListVo(id, day, word);
 		hangulservice.updateStudyCheck(studyListVo);
 	}
+	
+	
 	@RequestMapping(value="/select_date")
 	public ModelAndView selectDate(@RequestParam("date") String date,ModelAndView modelAndView) {
 		modelAndView.setViewName("hangul_input_complete");
 		StudyListVo studyListVo = new StudyListVo();
-		studyListVo.setDay(date);
-		List<StudyListVo> dateLearningWordList = hangulservice.getDateLearningWordList(studyListVo);
+		studyListVo.setDay(1);
+		List<StudyListVo> dateLearningWordList = hangulservice.getDateLearningWordListByDate(studyListVo);
+		
 		modelAndView.addObject("dateWordList", dateLearningWordList);
+		modelAndView.addObject("date", date);
 		return modelAndView;
 	}	
+	
+	@RequestMapping(value = "/filedown")
+	public String filedown(HttpServletRequest request) {
+		return "file_down";
+	}
+	
+	@RequestMapping(value = "/filedown-hangul")
+	public String filedownHangul(HttpServletRequest request) {
+		return "filedown_hangul";
+	}
+	
+	@RequestMapping(value = "/getLevelList")
+	public @ResponseBody String getLevelList(HttpServletRequest request) {
+		System.out.println("getLevelList");
+		String id = request.getParameter("id");
+		System.out.println(id);
+		List<LevelVo> levelVos = hangulservice.getLevelList(id);
+		System.out.println(gson.toJson(levelVos));
+		return gson.toJson(levelVos);
+	}
+	
+	@RequestMapping(value = "/getWordList")
+	public @ResponseBody String getWordList(HttpServletRequest request) {
+		System.out.println("getWordList");
+		String id = request.getParameter("id");
+		int day = Integer.parseInt(request.getParameter("day"));
+		StudyListVo studyListVo = new StudyListVo();
+		studyListVo.setId(id);
+		studyListVo.setDay(day);
+		List<StudyListVo> studyListVos = hangulservice.getWordList(studyListVo);
+		return gson.toJson(studyListVos);
+	}
+//	@RequestMapping(value="/hangul_input_complete")
+//	public ModelAndView hangulInputComplete(@RequestParam("date") String date,@RequestParam("word") String word,ModelAndView modelAndView) {
+//		modelAndView.setViewName("hangul_input_complete");
+//		System.out.println("create_word_by_date");
+//		StudyListVo studyListVo = new StudyListVo();
+//		studyListVo.setDay(date);
+//		studyListVo.setWord(word);
+//		List<StudyListVo> dateLearningWordList = hangulservice.createWordWithSelectWordList(studyListVo);
+//		
+//		modelAndView.addObject("dateWordList", dateLearningWordList);
+//		modelAndView.addObject("date", date);
+//		return modelAndView;
+//	}	
 }

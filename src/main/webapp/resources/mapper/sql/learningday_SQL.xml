@@ -3,18 +3,17 @@
 
 <mapper namespace="LearningDay">
 
-	<select id="getLearningDay" resultType="hashmap">
+	<select id="getLearningDay" resultType="di.cs.skuniv.model.StudyListVo">
 	
 			<![CDATA[
 				SELECT 
-					*
+					distinct day,word 
 				FROM 
-					hangul.learningday
-				
-							
+					hangul.learningday;
 			]]>
 	</select>
-	<select id="getUserLearningList" resultType="hashmap" parameterType="String">
+	<select id="getUserLearningList" resultType="hashmap"
+		parameterType="String">
 	
 			<![CDATA[
 				select
@@ -26,47 +25,111 @@
 							
 			]]>
 	</select>
-	<update id="updateStudyCheck"  parameterType="di.cs.skuniv.model.StudyListVo">
+	<update id="updateStudyCheck" parameterType="di.cs.skuniv.model.StudyListVo">
 	
 			<![CDATA[
 				UPDATE
-					hangul.user_learning
+					hangul.learningday
 				SET
-					checkword='1'
+					check_word="1"
 				WHERE
-					id=#{id} and day=#{day};
+					user_id=#{id} and day=#{day} and word=#{word};
 			]]>
 	</update>
-	<select id="getDateWordListByDate" resultType="di.cs.skuniv.model.StudyListVo" parameterType="di.cs.skuniv.model.StudyListVo">
+
+	<select id="getDateWordList" resultType="di.cs.skuniv.model.StudyListVo"
+		parameterType="di.cs.skuniv.model.StudyListVo">
+	
+			<![CDATA[
+				SELECT distinct 
+					learning.day as day,
+					learning.user_id as id,
+					learning.word as word,
+					learning.check_word as checkword 
+				FROM 
+					hangul.learningday learning, hangul.day_word dw 
+				where 
+					learning.day=dw.num and learning.user_id=#{id} and learning.day=#{day} order by dw.difficulty asc;
+			]]>
+	</select>
+	<select id="getDateWordListByDate" resultType="di.cs.skuniv.model.StudyListVo"
+		parameterType="di.cs.skuniv.model.StudyListVo">
 	
 			<![CDATA[
 				select
-					my_day as day,
-					num as num,
+					day as day,
 					word as word,
 					user_id as id,
 					check_word as checkword
 				from 
 					 hangul.learningday
 				where 
-					my_day=#{day};
+					day=#{day}
 			]]>
 	</select>
-	<select id="getDateWordList" resultType="di.cs.skuniv.model.StudyListVo" parameterType="di.cs.skuniv.model.StudyListVo">
+	<select id="selectLevel" resultType="di.cs.skuniv.model.LevelVo"
+		parameterType="String">
 	
 			<![CDATA[
-				select
-					my_day as day,
-					num as num,
-					word as word,
-					user_id as id,
-					check_word as checkword
-				from 
-					 hangul.learningday
+				SELECT
+					day as day,user_id as id, count(day) as word_count,sum(check_word) as check_count 
+				FROM 
+					hangul.learningday 
 				where 
-					my_day=#{day}
-					and 
-					user_id=#{id};
+					user_id=#{id} 
+				group by day;
 			]]>
 	</select>
+	<select id="getWordList" resultType="di.cs.skuniv.model.StudyListVo"
+		parameterType="di.cs.skuniv.model.StudyListVo">
+	
+			<![CDATA[
+				SELECT 
+					day as day,
+					word as word,
+					user_id as id,
+					check_word as checkword 
+				FROM 
+					hangul.learningday
+				where 
+					user_id=#{id} and day=#{day};
+			]]>
+	</select>
+	<insert id="createWordByDate" parameterType="di.cs.skuniv.model.StudyListVo">
+	
+			<![CDATA[
+				INSERT INTO 
+					hangul.learningday (day,word) 
+				VALUES (#{day}, #{word});
+
+			]]>
+	</insert>
+	<insert id="userOnLeanrningDay" parameterType="di.cs.skuniv.model.StudyListVo">
+	
+			<![CDATA[
+				INSERT INTO
+					 hangul.learningday (day, word, user_id, check_word) 
+				VALUES (#{day}, #{word}, #{id}, #{checkword});
+
+
+			]]>
+	</insert>
+		<insert id="addStudyUser" parameterType="di.cs.skuniv.model.StudyListVo">
+	
+			<![CDATA[
+				INSERT INTO 
+					hangul.learningday (day,word,user_id) 
+				VALUES (#{day}, #{word},#{id});
+
+			]]>
+	</insert>
+		<delete id="delete" parameterType="di.cs.skuniv.model.StudyListVo">
+	
+			<![CDATA[
+				DELETE FROM 
+					hangul.learningday 
+				WHERE day=#{day} and word=#{word};
+
+			]]>
+	</delete>
 </mapper>

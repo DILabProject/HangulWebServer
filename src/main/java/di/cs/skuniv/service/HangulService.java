@@ -1,7 +1,6 @@
 package di.cs.skuniv.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,19 +8,17 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 import di.cs.skuniv.dao.HangulDao;
+import di.cs.skuniv.model.DayVo;
+import di.cs.skuniv.model.DayWordVo;
 import di.cs.skuniv.model.DrawVO;
 import di.cs.skuniv.model.HangulVO;
 import di.cs.skuniv.model.JudgeVo;
 import di.cs.skuniv.model.LetterVo;
-import di.cs.skuniv.model.StudyListVo;
+import di.cs.skuniv.model.LevelVo;
 import di.cs.skuniv.model.StudyListVo;
 import di.cs.skuniv.model.UserVo;
 import di.cs.skuniv.model.WrongCountVo;
-import di.cs.skuniv.model.UserVo;
 
 @Service("HangulService")
 public class HangulService {
@@ -51,7 +48,7 @@ public class HangulService {
 		String lastStr = "";
 
 		System.out.println(tempStr);
-		
+
 		for (int i = 0; i < tempStr.length(); i++) {
 
 			List<DrawVO> word_unit_jsonArray = new ArrayList<DrawVO>();
@@ -76,12 +73,12 @@ public class HangulService {
 				// 종성이 있다면
 				if ((char) jon != 0x0000) {
 					System.out.println("" + JON[jon] + "// 0x" + Integer.toHexString((char) jon));
-					judgmentJun(word_unit_jsonArray,stroke_unit,word,stroke,intCho,intJun,intJon,1);
-					
+					judgmentJun(word_unit_jsonArray, stroke_unit, word, stroke, intCho, intJun, intJon, 1);
+
 				} else {
-					judgmentJun(word_unit_jsonArray,stroke_unit,word,stroke,intCho,intJun,intJon,0);
+					judgmentJun(word_unit_jsonArray, stroke_unit, word, stroke, intCho, intJun, intJon, 0);
 				}
-				
+
 			}
 		}
 		hangulVO.setWord(word);
@@ -112,8 +109,11 @@ public class HangulService {
 
 	public void signUp(UserVo userVo) {
 		hanguldao.signUp(userVo);
-		hanguldao.createUserLearning(userVo);
-
+		List<StudyListVo> studyListVos = hanguldao.getLeanrningDay();
+		for (StudyListVo studyListVo : studyListVos) {
+			studyListVo.setId(userVo.getId());
+			hanguldao.insertUserOnLeanrningDay(studyListVo);
+		}
 	}
 
 	public void wrongCount(WrongCountVo wrongCount) {
@@ -124,15 +124,15 @@ public class HangulService {
 		List<StudyListVo> studyVoList = new ArrayList<StudyListVo>();
 		List<Map<String, Object>> list = hanguldao.getUserLearningList(id);
 		StudyListVo studyListVo;
+
 		for (int i = 0; i < list.size(); i++) {
 			studyListVo = new StudyListVo();
 			studyListVo.setCheckword(list.get(i).get("checkword").toString());
-			studyListVo.setDay(list.get(i).get("day").toString());
+			studyListVo.setDay((Integer) list.get(i).get("day"));
 			studyListVo.setId(list.get(i).get("id").toString());
 			studyListVo.setWord(list.get(i).get("word").toString());
 			studyVoList.add(studyListVo);
 		}
-
 		return studyVoList;
 	}
 
@@ -140,17 +140,19 @@ public class HangulService {
 		hanguldao.updateStudyCheck(studyListVo);
 
 	}
-	private void judgement(List<DrawVO> word_unit_jsonArray ,List<LetterVo> stroke_unit, List<List<DrawVO>> word,List<List<LetterVo>> stroke,int intCho,int intJun,int intJon,int judge,int junDataBaseNum) {
+
+	private void judgement(List<DrawVO> word_unit_jsonArray, List<LetterVo> stroke_unit, List<List<DrawVO>> word,
+			List<List<LetterVo>> stroke, int intCho, int intJun, int intJon, int judge, int junDataBaseNum) {
 		List<Map<String, Object>> return_db;
 		JudgeVo judgeVo;
-		if(judge==0) {
+		if (judge == 0) {
 			System.out.println(intCho);
-			judgeVo=new JudgeVo(intCho, junDataBaseNum, 0);	
-		}else {
+			judgeVo = new JudgeVo(intCho, junDataBaseNum, 0);
+		} else {
 			System.out.println(intCho);
-			judgeVo=new JudgeVo(intCho, junDataBaseNum, 1);
+			judgeVo = new JudgeVo(intCho, junDataBaseNum, 1);
 		}
-		
+
 		// 초성
 		return_db = hanguldao.getCho(judgeVo);
 		LetterVo letterVo;
@@ -167,15 +169,14 @@ public class HangulService {
 
 		process(return_db, word_unit_jsonArray);
 
-		
-		if(judge==0) {
+		if (judge == 0) {
 			System.out.println(intJun);
-			judgeVo=new JudgeVo(0, intJun, 0);
+			judgeVo = new JudgeVo(0, intJun, 0);
 			System.out.println(intJun);
-		}else {
-			judgeVo=new JudgeVo(0, intJun, 1);
+		} else {
+			judgeVo = new JudgeVo(0, intJun, 1);
 		}
-		
+
 		// 중성
 		return_db = hanguldao.getJun(judgeVo);
 		letter = return_db.get(0).get("stroke_amount").toString().split(",");
@@ -193,8 +194,8 @@ public class HangulService {
 		// 종성이 있으면
 		if (judge == 1) {
 			System.out.println(intJon);
-			judgeVo=new JudgeVo(0, junDataBaseNum, intJon);	
-			
+			judgeVo = new JudgeVo(0, junDataBaseNum, intJon);
+
 			return_db = hanguldao.getJon(judgeVo);
 			letter = return_db.get(0).get("stroke_amount").toString().split(",");
 
@@ -208,33 +209,90 @@ public class HangulService {
 			process(return_db, word_unit_jsonArray);
 
 		}
-		
-		
+
 		stroke.add(stroke_unit);
 		word.add(word_unit_jsonArray);
 	}
-	private void judgmentJun(List<DrawVO> word_unit_jsonArray ,List<LetterVo> stroke_unit, List<List<DrawVO>> word,List<List<LetterVo>> stroke,int intCho,int intJun,int intJon,int judge) {
-	
+
+	private void judgmentJun(List<DrawVO> word_unit_jsonArray, List<LetterVo> stroke_unit, List<List<DrawVO>> word,
+			List<List<LetterVo>> stroke, int intCho, int intJun, int intJon, int judge) {
+
 		// ㅏ ㅐ ㅑ ㅒ ㅓ ㅔ ㅕ ㅖ ㅣ -> DB 중성 종류 1
-		if (intJun == 0 || intJun == 1 || intJun == 2 || intJun == 3 || intJun == 4 || intJun == 5
-				|| intJun == 6 || intJun == 7 || intJun == 20) {
-			judgement(word_unit_jsonArray,stroke_unit,word,stroke,intCho,intJun,intJon,judge,1);
-		}// ㅗ ㅛ ㅡ  -> DB 중성 종류 2
+		if (intJun == 0 || intJun == 1 || intJun == 2 || intJun == 3 || intJun == 4 || intJun == 5 || intJun == 6
+				|| intJun == 7 || intJun == 20) {
+			judgement(word_unit_jsonArray, stroke_unit, word, stroke, intCho, intJun, intJon, judge, 1);
+		} // ㅗ ㅛ ㅡ -> DB 중성 종류 2
 		else if (intJun == 8 || intJun == 12 || intJun == 18) {
-			judgement(word_unit_jsonArray,stroke_unit,word,stroke,intCho,intJun,intJon,judge,2);
+			judgement(word_unit_jsonArray, stroke_unit, word, stroke, intCho, intJun, intJon, judge, 2);
 		} // ㅜ ㅠ -> DB 중성 종류 3
 		else if (intJun == 13 || intJun == 17) {
-			judgement(word_unit_jsonArray,stroke_unit,word,stroke,intCho,intJun,intJon,judge,3);
+			judgement(word_unit_jsonArray, stroke_unit, word, stroke, intCho, intJun, intJon, judge, 3);
 		} // ㅟ ㅞ ㅝ -> DB 중성 종류 4
 		else if (intJun == 16 || intJun == 15 || intJun == 14) {
-			judgement(word_unit_jsonArray,stroke_unit,word,stroke,intCho,intJun,intJon,judge,4);
+			judgement(word_unit_jsonArray, stroke_unit, word, stroke, intCho, intJun, intJon, judge, 4);
 		} // ㅚ ㅙ ㅘ ㅢ -> DB 중성 종류 5
 		else if (intJun == 10 || intJun == 11 || intJun == 9 || intJun == 19) {
-			judgement(word_unit_jsonArray,stroke_unit,word,stroke,intCho,intJun,intJon,judge,5);
+			judgement(word_unit_jsonArray, stroke_unit, word, stroke, intCho, intJun, intJon, judge, 5);
 		}
 	}
 
 	public List<StudyListVo> getDateLearningWordList(StudyListVo studyListVo) {
 		return hanguldao.getDateLearningWordList(studyListVo);
+	}
+
+	public List<StudyListVo> getDateLearningWordListByDate(StudyListVo studyListVo) {
+		return hanguldao.getDateLearningWordListByDate(studyListVo);
+	}
+
+	public List<StudyListVo> createWordWithSelectWordList(StudyListVo studyListVo) {
+		hanguldao.createWordByDate(studyListVo);
+		return hanguldao.getDateLearningWordListByDate(studyListVo);
+	}
+
+	public List<DayVo> getDayList() {
+		return hanguldao.getDayList();
+	}
+
+	public List<DayWordVo> getDayWordList(String day) {
+		return hanguldao.getDayWordList(day);
+	}
+
+	public void createDay(int i) {
+		hanguldao.createDay(new DayVo(i, i + "일차"));
+	}
+
+	public void addWord(DayWordVo dayWordVo) {
+		hanguldao.addWord(dayWordVo);
+		List<UserVo> userVos = hanguldao.selectUser();
+
+		for (UserVo userVo : userVos) {
+			StudyListVo studyListVo = new StudyListVo();
+			studyListVo.setDay(dayWordVo.getNum());
+			studyListVo.setWord(dayWordVo.getWord());
+			studyListVo.setId(userVo.getId());
+			hanguldao.insertUserOnLeanrningDay(studyListVo);
+		}
+
+	}
+
+	public void deleteWord(DayWordVo dayWordVo) {
+		hanguldao.deleteWord(dayWordVo);
+	}
+
+	public void addStudyUserVo(StudyListVo studyListVo) {
+		hanguldao.addStudyUserVo(studyListVo);
+	}
+
+	public void deleteWord(StudyListVo studyListVo) {
+		hanguldao.removeLearning(studyListVo);
+
+	}
+
+	public List<LevelVo> getLevelList(String id) {
+		return hanguldao.getLevelList(id);
+	}
+
+	public List<StudyListVo> getWordList(StudyListVo studyListVo) {
+		return hanguldao.getWordList(studyListVo);
 	}
 }
